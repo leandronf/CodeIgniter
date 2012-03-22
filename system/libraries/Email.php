@@ -59,6 +59,7 @@ class CI_Email {
 	public $crlf		= "\n";			// The RFC 2045 compliant CRLF for quoted-printable is "\r\n".  Apparently some servers,
 									// even on the receiving end think they need to muck with CRLFs, so using "\n", while
 									// distasteful, is the only thing that seems to work for all environments.
+	public $dsn		= FALSE;		// Delivery Status Notification
 	public $send_multipart	= TRUE;		// TRUE/FALSE - Yahoo does not like multipart alternative, so this is an override.  Set to FALSE for Yahoo.
 	public $bcc_batch_mode	= FALSE;	// TRUE/FALSE - Turns on/off Bcc batch feature
 	public $bcc_batch_size	= 200;		// If bcc_batch_mode = TRUE, sets max number of Bccs in each batch
@@ -1548,10 +1549,13 @@ class CI_Email {
 			case 'hello' :
 
 					if ($this->_smtp_auth OR $this->_get_encoding() == '8bit')
+					{
 						$this->_send_data('EHLO '.$this->_get_hostname());
+					}
 					else
+					{
 						$this->_send_data('HELO '.$this->_get_hostname());
-
+					}
 						$resp = 250;
 			break;
 			case 'starttls'	:
@@ -1568,7 +1572,10 @@ class CI_Email {
 			break;
 			case 'to'	:
 
-						$this->_send_data('RCPT TO:<'.$data.'>');
+						if( $this->dsn )
+							$this->_send_data('RCPT TO:<'.$data.'> NOTIFY=SUCCESS,DELAY,FAILURE ORCPT=rfc822;'.$data);
+						else
+							$this->_send_data('RCPT TO:<'.$data.'>');
 
 						$resp = 250;
 			break;
