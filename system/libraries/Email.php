@@ -1572,10 +1572,14 @@ class CI_Email {
 			break;
 			case 'to'	:
 
-						if( $this->dsn )
+						if ($this->dsn)
+						{
 							$this->_send_data('RCPT TO:<'.$data.'> NOTIFY=SUCCESS,DELAY,FAILURE ORCPT=rfc822;'.$data);
+						}
 						else
+						{
 							$this->_send_data('RCPT TO:<'.$data.'>');
+						}
 
 						$resp = 250;
 			break;
