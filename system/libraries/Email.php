@@ -2235,8 +2235,9 @@ class CI_Email {
 	{
 		$data = '';
 
-		while ($str = fgets($this->_smtp_connect, 512))
+		while (is_resource($this->_smtp_connect) && !feof($this->_smtp_connect))
 		{
+			$str = fgets($this->_smtp_connect, 512);
 			$data .= $str;
 
 			if ($str[3] === ' ')
